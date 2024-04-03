@@ -1,4 +1,7 @@
 
+from collections import deque
+
+
 class Solution:
     
     #Function to insert all elements of the array in deque.
