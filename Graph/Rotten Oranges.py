@@ -1,57 +1,47 @@
+from collections import deque
 class Solution:
 
     #Function to find minimum time required to rot all oranges. 
-	def orangesRotting(self, grid):
-		#Code here
-        from queue import Queue
-        
-        
-        ct = 0 
-        res = -1 
-        
-        #queue to store cells which have rotten oranges.
-        q = Queue()
-        dx = [-1,1,0,0]
-        dy = [0,0,-1,1]
-        
-        #traversing over all the cells of the matrix.
-        for i in range(len(grid)):
-            for j in range(len(grid[0])):
-                
-                #if grid value is more than 0, we increment the counter.
-                if grid[i][j]>0:
-                    ct+=1
-                    
-                #if grid value is 2, we push the cell indexes into queue.
-                if(grid[i][j]==2):
-                    q.put([i,j])
-        
-        while not q.empty():
-            
-            #incrementing result counter.
-            res+=1 
-            size = q.qsize()
-            for k in range(size):
-                
-                #popping the front element of queue and storing cell indexes.
-                cur = q.get()
-                ct -= 1
-                
-                #traversing the adjacent vertices.
-                for i in range(4):
-                    x = cur[0] + dx[i]
-                    y = cur[1] + dy[i]
-                    
-                    #if cell indexes are within matrix bounds and grid value
-                    #is not 1, we continue the loop else we store 2 in current
-                    #cell and push the cell indexes in the queue.
-                    if x>=len(grid) or x<0 or y>=len(grid[0]) or y<0 or grid[x][y]!=1:
-                        continue
-                    grid[x][y] = 2
-                    q.put([x,y])
-        
-        #returning the minimum time.
-        if ct:
+    def orangesRotting(self, grid):
+        #Code here
+        if not grid:
             return -1
-        else:
-            return max(0,res)
+        
+        rows, cols = len(grid), len(grid[0])
+        fresh_count = 0
+        queue = deque()
+        
+        # Find all rotten oranges and add their positions to the queue.
+        for i in range(rows):
+            for j in range(cols):
+                if grid[i][j] == 2:
+                    queue.append((i, j))
+                elif grid[i][j] == 1:
+                    fresh_count += 1
+        
+        # If there are no fresh oranges initially, return 0.
+        if fresh_count == 0:
+            return 0
+        
+        time = 0
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        
+        # BFS traversal to rot oranges.
+        while queue:
+            size = len(queue)
+            for _ in range(size):
+                x, y = queue.popleft()
+                for dx, dy in directions:
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < rows and 0 <= ny < cols and grid[nx][ny] == 1:
+                        grid[nx][ny] = 2
+                        fresh_count -= 1
+                        queue.append((nx, ny))
+            time += 1
+            
+            # If there are no fresh oranges left, return the time.
+            if fresh_count == 0:
+                return time
+        
+        # If there are still fresh oranges left, return -1.
+        return -1
