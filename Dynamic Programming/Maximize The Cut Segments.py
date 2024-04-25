@@ -1,21 +1,19 @@
-
 class Solution:
     
     #Function to find the maximum number of cuts.
     def maximizeTheCuts(self,n,x,y,z):
         #code here
-        dp = [float('-inf')] * (n + 1)
-        dp[0] = 0
-
-        for i in range(1, n + 1):
-            if i - x >= 0:
-                dp[i] = max(dp[i], dp[i - x] + 1)
-            if i - y >= 0:
-                dp[i] = max(dp[i], dp[i - y] + 1)
-            if i - z >= 0:
-                dp[i] = max(dp[i], dp[i - z] + 1)
-
-        if dp[n] < 0:
-            return 0
-        else:
-            return dp[n]
+        dp = [0 for i in range(n)] + [1]
+        cuts = tuple(set([x,y,z]))
+        
+        # print(cuts)
+        if 1 in cuts: return n
+        if min(cuts) > n: return 0
+        if min(cuts) == n: return 1
+        
+        for i in range(n-min(cuts),-1,-1):
+            for j in cuts:
+                if i+j <= n and dp[i+j] > 0: dp[i] = max(dp[i], dp[i+j]+1)
+            
+            
+        return dp[0]-1 if dp[0] != 0 else 0s
